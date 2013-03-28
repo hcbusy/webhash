@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebHash - Find Hash</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+	 <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min.js"></script>
+	 <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
+	 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+  </head>
+  <body>
+    <h1>WebHash</h1>
+    <p>Welcome to WebHash Finder</p>
+	 Enter the hash:<input type='text' data-bind='value: hash'></input>
+	 <button data-bind='click: refresh'>Refresh</button>, click <a href="/about">here</a> for more detailed description, <a href="/">home</a> or <a href="/find">find your hash</a>.
+	<p><span data-bind="text: status"></span></p>
+		  <table border=1>
+				<thead>
+					 <tr><th>URL</th><th>Time</th><th>type</th><th>name</th></tr>
+				</thead>
+				<tbody data-bind="foreach: results">
+					 <tr>
+						  <td><a title="Click here to see all hashes for this URL" data-bind="attr: { href: '/?u='+escape(url)}"><span data-bind="text: url"></span></a></td>
+						  <td data-bind="text: ts"></td>
+						  <td data-bind="text: hashType"></td>
+						  <td data-bind="text: name"></td>
+					 </tr>
+				</tbody>
+		  </table>
+
+	<script type="application/javascript" src="javascripts/prep.js" ></script>
+	<script type="application/javascript" src="javascripts/util.js" ></script>
+	<script> 
+	   var vm={
+			hash   : ko.observable("<%= hash %>"),
+			status : ko.observable("ready"),
+			results:ko.observableArray(),
+			url:ko.observable(),
+			refresh:function(){
+				var url='/api/findHash?h='+cleanPlus(escape(vm.hash()));
+				console.log("refreshing:"+url);
+				$.getJSON(url,
+						function(data){ vm.results(data);});
+			}
+		}
+		ko.applyBindings(vm);
+		if(vm.hash() != null && vm.hash().length>0){
+			vm.refresh();
+		}
+	</script>
+  </body>
+</html>
